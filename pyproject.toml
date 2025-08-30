@@ -1,0 +1,24 @@
+[project]
+name = "kaelo-hw-alert"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.116.1",
+    "pydantic>=2.11.7",
+    "python-json-logger>=3.3.0",
+    "uvicorn>=0.35.0",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.0.0",
+    "pytest-mock>=3.11.0",
+]
+rpi = [
+    "gpiod>=2.2.2; sys_platform == 'linux'",
+    "smbus2>=0.5.0; sys_platform == 'linux'",
+]

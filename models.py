@@ -17,7 +17,9 @@ class SensorData(BaseModel):
 
 class HardwareAlertRequest(BaseModel):
     sensor_data: SensorData
-    severity: Literal["critical", "high", "medium", "low"] = Field(..., description="Alert severity level")
+    severity: Literal["critical", "high", "medium", "low"] = Field(
+        ..., description="Alert severity level"
+    )
     alert_type: str = Field(..., description="Type of alert (e.g., overheat, gas_leak)")
 
 

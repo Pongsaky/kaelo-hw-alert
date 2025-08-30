@@ -4,7 +4,6 @@ Script to create and manage systemd service for Hardware Alert API
 Run this script on your Raspberry Pi to set up auto-start service
 """
 
-import os
 import subprocess
 import sys
 from pathlib import Path
@@ -12,12 +11,12 @@ from pathlib import Path
 
 def create_systemd_service():
     """Create systemd service file for the Hardware Alert API"""
-    
+
     # Get current directory (where the project is located)
     project_dir = Path(__file__).parent.absolute()
     venv_python = project_dir / "venv" / "bin" / "python"
     main_py = project_dir / "main.py"
-    
+
     # Service file content
     service_content = f"""[Unit]
 Description=Hardware Alert API
@@ -39,26 +38,31 @@ StandardError=journal
 [Install]
 WantedBy=multi-user.target
 """
-    
+
     service_file_path = "/etc/systemd/system/hardware-alert-api.service"
-    
+
     try:
         # Write service file (requires sudo)
         print("Creating systemd service file...")
         with open("/tmp/hardware-alert-api.service", "w") as f:
             f.write(service_content)
-        
+
         # Move to systemd directory with sudo
-        subprocess.run(["sudo", "mv", "/tmp/hardware-alert-api.service", service_file_path], check=True)
-        
+        subprocess.run(
+            ["sudo", "mv", "/tmp/hardware-alert-api.service", service_file_path],
+            check=True,
+        )
+
         # Reload systemd daemon
         print("Reloading systemd daemon...")
         subprocess.run(["sudo", "systemctl", "daemon-reload"], check=True)
-        
+
         # Enable service
         print("Enabling service...")
-        subprocess.run(["sudo", "systemctl", "enable", "hardware-alert-api.service"], check=True)
-        
+        subprocess.run(
+            ["sudo", "systemctl", "enable", "hardware-alert-api.service"], check=True
+        )
+
         print("✅ Systemd service created successfully!")
         print("\nService management commands:")
         print("  Start:   sudo systemctl start hardware-alert-api")
@@ -66,9 +70,9 @@ WantedBy=multi-user.target
         print("  Status:  sudo systemctl status hardware-alert-api")
         print("  Logs:    sudo journalctl -u hardware-alert-api -f")
         print("  Restart: sudo systemctl restart hardware-alert-api")
-        
+
         return True
-        
+
     except subprocess.CalledProcessError as e:
         print(f"❌ Error creating service: {e}")
         return False
@@ -102,8 +106,11 @@ def stop_service():
 def service_status():
     """Check service status"""
     try:
-        result = subprocess.run(["sudo", "systemctl", "status", "hardware-alert-api"], 
-                              capture_output=True, text=True)
+        result = subprocess.run(
+            ["sudo", "systemctl", "status", "hardware-alert-api"],
+            capture_output=True,
+            text=True,
+        )
         print(result.stdout)
         return True
     except subprocess.CalledProcessError as e:
@@ -116,9 +123,9 @@ def main():
     if len(sys.argv) < 2:
         print("Usage: python3 systemd_service.py [create|start|stop|status]")
         sys.exit(1)
-    
+
     command = sys.argv[1].lower()
-    
+
     if command == "create":
         create_systemd_service()
     elif command == "start":
