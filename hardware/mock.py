@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-import time, math, threading, signal, sys, logging
+import time
+import math
+import threading
+import signal
+import sys
+import logging
 import gpiod
 
 # --------- Config ---------

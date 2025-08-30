@@ -15,7 +15,6 @@ def create_systemd_service():
     # Get current directory (where the project is located)
     project_dir = Path(__file__).parent.absolute()
     venv_python = project_dir / "venv" / "bin" / "python"
-    main_py = project_dir / "main.py"
 
     # Service file content
     service_content = f"""[Unit]

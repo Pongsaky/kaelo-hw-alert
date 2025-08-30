@@ -41,14 +41,22 @@ FastAPI-based IoT hardware alert system for Raspberry Pi with LED and buzzer con
 {
   "sensor_data": {
     "device_id": "DEV-001",
-    "temperature": 28.5,
+    "temperature_dht": 28.5,
     "humidity": 65.2,
-    "dust": 50.7,
-    "flame": 10.0,
-    "light": 750.0,
-    "vibration": 0.0,
-    "gas": 300.0,
-    "timestamp": "2025-08-29T01:55:58.123456+07:00"
+    "gas_quality": "poor",
+    "acceleration": {
+      "x": 0.12,
+      "y": -0.05,
+      "z": 9.78
+    },
+    "gyroscope": {
+      "x": 2.1,
+      "y": -0.3,
+      "z": 1.4
+    },
+    "flame_detected": true,
+    "timestamp": "2025-08-29T01:55:58.123456+07:00",
+    "temperature_mpu": 27.8
   },
   "severity": "critical",
   "alert_type": "overheat"

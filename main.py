@@ -8,11 +8,9 @@ from models import HardwareAlertRequest, AlertResponse
 from hardware_controller import HardwareController
 from logger_config import StructuredLogger
 
-
 # Global instances
 hardware_controller = None
 structured_logger = StructuredLogger()
-
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -78,7 +76,7 @@ async def health_check():
         if hardware_controller
         else False,
         "queue_size": queue_size,
-        "gpiod_available": hardware_controller.chip is not None
+        "gpiod_available": hardware_controller.gpio is not None
         if hardware_controller
         else False,
         "timestamp": datetime.now().isoformat(),
