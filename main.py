@@ -110,14 +110,15 @@ async def hardware_alert(request: HardwareAlertRequest, http_request: Request):
             user_agent=user_agent,
         )
 
-        # Queue the alert for processing
+        # Queue the alert for processing (always use critical severity)
+        # Original severity from request: request.severity (kept for logging)
         alert_id = await hardware_controller.queue_alert(
-            severity=request.severity,
+            severity="critical",  # Always use critical severity
             alert_type=request.alert_type,
             device_id=request.sensor_data.device_id,
         )
 
-        # Log alert queued
+        # Log alert queued (log the original requested severity for tracking)
         queue_size = hardware_controller.alert_queue.qsize()
         structured_logger.log_alert_queued(alert_id, request.severity, queue_size)
 
