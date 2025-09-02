@@ -26,8 +26,8 @@ class GPIO:
 
     def __init__(self, chip_name: str = "gpiochip0"):
         self.v2 = hasattr(gpiod, "LineSettings")
-        self.chip = gpiod.Chip(chip_name)
         self.logger = logging.getLogger(__name__)
+        self.chip = gpiod.Chip(chip_name)
         self.logger.info("Using libgpiod %s API", "v2" if self.v2 else "v1")
 
         if self.v2:
@@ -157,36 +157,45 @@ class HardwareController:
         self.led_on_level, self.led_off_level = (0, 1) if common_anode else (1, 0)
 
         if GPIOD_AVAILABLE:
-            self.gpio = GPIO(chip_name)
+            try:
+                self.gpio = GPIO(chip_name)
 
-            # Initialize GPIO pins
-            self.gpio.request_output(
-                red_pin, initial=self.led_off_level, consumer="rgb-red"
-            )
-            self.gpio.request_output(
-                green_pin, initial=self.led_off_level, consumer="rgb-green"
-            )
-            self.gpio.request_output(
-                blue_pin, initial=self.led_off_level, consumer="rgb-blue"
-            )
-            self.gpio.request_output(buzzer_pin, initial=0, consumer="buzzer")
+                # Initialize GPIO pins
+                self.gpio.request_output(
+                    red_pin, initial=self.led_off_level, consumer="rgb-red"
+                )
+                self.gpio.request_output(
+                    green_pin, initial=self.led_off_level, consumer="rgb-green"
+                )
+                self.gpio.request_output(
+                    blue_pin, initial=self.led_off_level, consumer="rgb-blue"
+                )
+                self.gpio.request_output(buzzer_pin, initial=0, consumer="buzzer")
 
-            # Initialize PWM for smooth LED control
-            self.pwm_r = SoftPWM(self.gpio, red_pin, pwm_freq, 0.0, common_anode)
-            self.pwm_g = SoftPWM(self.gpio, green_pin, pwm_freq, 0.0, common_anode)
-            self.pwm_b = SoftPWM(self.gpio, blue_pin, pwm_freq, 0.0, common_anode)
+                # Initialize PWM for smooth LED control
+                self.pwm_r = SoftPWM(self.gpio, red_pin, pwm_freq, 0.0, common_anode)
+                self.pwm_g = SoftPWM(self.gpio, green_pin, pwm_freq, 0.0, common_anode)
+                self.pwm_b = SoftPWM(self.gpio, blue_pin, pwm_freq, 0.0, common_anode)
 
-            # Start PWM threads
-            self.pwm_r.start()
-            self.pwm_g.start()
-            self.pwm_b.start()
+                # Start PWM threads
+                self.pwm_r.start()
+                self.pwm_g.start()
+                self.pwm_b.start()
 
-            self.logger.info(
-                f"GPIO initialized - RGB: R={red_pin}, G={green_pin}, B={blue_pin}, Buzzer: {buzzer_pin}"
-            )
-            self.logger.info(
-                f"PWM frequency: {pwm_freq}Hz, Common anode: {common_anode}"
-            )
+                self.logger.info(
+                    f"GPIO initialized - RGB: R={red_pin}, G={green_pin}, B={blue_pin}, Buzzer: {buzzer_pin}"
+                )
+                self.logger.info(
+                    f"PWM frequency: {pwm_freq}Hz, Common anode: {common_anode}"
+                )
+
+            except (RuntimeError, FileNotFoundError, Exception) as e:
+                self.logger.warning(f"GPIO initialization failed: {e}")
+                self.logger.info("Falling back to simulation mode")
+                self.gpio = None
+                self.pwm_r = None
+                self.pwm_g = None
+                self.pwm_b = None
         else:
             self.gpio = None
             self.pwm_r = None

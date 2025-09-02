@@ -12,6 +12,7 @@ from logger_config import StructuredLogger
 hardware_controller = None
 structured_logger = StructuredLogger()
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifespan manager"""
