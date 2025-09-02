@@ -189,6 +189,10 @@ class HardwareController:
                     f"PWM frequency: {pwm_freq}Hz, Common anode: {common_anode}"
                 )
 
+                # Set default LED color to green (system ready indicator)
+                self.set_rgb_color(0.0, 0.6, 0.0)
+                self.logger.info("LED set to green (system ready)")
+
             except (RuntimeError, FileNotFoundError, Exception) as e:
                 self.logger.warning(f"GPIO initialization failed: {e}")
                 self.logger.info("Falling back to simulation mode")
@@ -328,10 +332,10 @@ class HardwareController:
             self.set_rgb_color(intensity, 0.0, 0.0)
             await asyncio.sleep(0.02)  # 50Hz update rate
 
-        # Stop buzzer and turn off LED
+        # Stop buzzer and return LED to green
         if GPIOD_AVAILABLE:
             self.gpio.set_level(self.buzzer_pin, 0)
-        self.rgb_off()
+        self.set_rgb_color(0.0, 0.6, 0.0)  # Return to green (system ready)
 
     async def _high_alert(self):
         """High: Orange breathing effect + 3 buzzer beeps"""
@@ -354,7 +358,7 @@ class HardwareController:
             self.set_rgb_color(intensity, intensity * 0.5, 0.0)  # Orange
             await asyncio.sleep(0.02)
 
-        self.rgb_off()
+        self.set_rgb_color(0.0, 0.6, 0.0)  # Return to green (system ready)
 
     async def _medium_alert(self):
         """Medium: Slow blue fade for 5 seconds (no buzzer)"""
@@ -370,21 +374,21 @@ class HardwareController:
             self.set_rgb_color(0.0, 0.0, intensity)  # Blue
             await asyncio.sleep(0.05)
 
-        self.rgb_off()
+        self.set_rgb_color(0.0, 0.6, 0.0)  # Return to green (system ready)
 
     async def _low_alert(self):
         """Low: Gentle green glow for 2 seconds (no buzzer)"""
         # Gentle green glow (not full brightness)
         self.set_rgb_color(0.0, 0.6, 0.0)  # Soft green
         await asyncio.sleep(2.0)
-        self.rgb_off()
+        self.set_rgb_color(0.0, 0.6, 0.0)  # Return to green (system ready)
 
     def cleanup(self):
         """Clean up GPIO resources"""
         if GPIOD_AVAILABLE and self.gpio:
             try:
                 # Turn off all outputs
-                self.rgb_off()
+                self.set_rgb_color(0.0, 0.0, 0.0)  # Turn off LED on cleanup
                 self.gpio.set_level(self.buzzer_pin, 0)
 
                 # Stop PWM threads
